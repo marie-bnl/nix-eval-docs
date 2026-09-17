@@ -1,0 +1,22 @@
+diff --git a/src/libexpr-c/nix_api_value.cc b/src/libexpr-c/nix_api_value.cc
+index 0b1bc45..d0bea93 100644
+--- a/src/libexpr-c/nix_api_value.cc
++++ b/src/libexpr-c/nix_api_value.cc
+@@ -722,4 +722,17 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
+     return &s->storePaths[i];
+ }
+ 
++const char * nix_get_value_doc(nix_c_context * context, EvalState * state, const nix_value * value)
++{
++    if (context)
++        context->last_err_code = NIX_OK;
++    try {
++        auto & v = check_value_in(value);
++        assert(v.type() == nix::nFunction); // TODO: Also check if it's a PrimOps or a Functor
++        auto doc = state->getDoc();
++        if (doc) *doc else ""; // TODO: There sure is a better solution than return ""
++    }
++    NIXC_CATCH_ERRS_NULL
++}
++
+ } // extern "C"

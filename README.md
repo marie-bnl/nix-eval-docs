@@ -1,7 +1,7 @@
 ## Building
 
 ```
-nix build .#nix-plugin
+nix build .#nix-patched
 ```
 
-(Or use `path:.#nix-plugin` to test uncommitted changes)
+(Or use `path:.#nix-patched` to test uncommitted changes)

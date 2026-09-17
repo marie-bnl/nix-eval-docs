@@ -12,8 +12,8 @@
       };
     in
     {
-      packages.${system} = {
-        nix-plugin = pkgs.callPackage ./nix-plugin/package.nix { };
-      };
+      packages.${system}.nix-patched = pkgs.nixVersions.nix_2_35.appendPatches [
+        ./patches/nix-get-value-doc.patch
+      ];
     };
 }
