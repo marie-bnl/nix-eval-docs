@@ -14,7 +14,7 @@
 
 /*
   Includes above copied from `<nix>/src/libexpr-c/` for convenience.
-  TODO: Once this plugin builds, remove unused onces.
+  TODO: Once this plugin builds, remove unused ones.
 */
 
 const char * nix_get_value_doc(nix_c_context * context, EvalState * state, const nix_value * value)
