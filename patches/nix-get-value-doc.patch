@@ -14,7 +14,7 @@ index 0b1bc45..d0bea93 100644
 +        auto & v = check_value_in(value);
 +        assert(v.type() == nix::nFunction); // TODO: Also check if it's a PrimOps or a Functor
 +        auto doc = state->getDoc();
-+        if (doc) *doc else ""; // TODO: There sure is a better solution than return ""
++        if (doc) *doc else ""; // TODO: There surely is a better solution than return ""
 +    }
 +    NIXC_CATCH_ERRS_NULL
 +}
