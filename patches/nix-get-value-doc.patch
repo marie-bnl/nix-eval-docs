@@ -6,7 +6,7 @@ index 0b1bc45..d0bea93 100644
      return &s->storePaths[i];
  }
  
-+const char * nix_get_value_doc(nix_c_context * context, EvalState * state, const nix_value * value)
++const char * nix_get_value_doc(nix_c_context * context, EvalState * state, nix_value * value)
 +{
 +    if (context)
 +        context->last_err_code = NIX_OK;
@@ -14,7 +14,7 @@ index 0b1bc45..d0bea93 100644
 +        auto & v = check_value_in(value);
 +        assert(v.type() == nix::nFunction); // TODO: Also check if it's a PrimOps or a Functor
 +        auto doc = state->state.getDoc(v);
-+        if (doc) *doc else ""; // TODO: There surely is a better solution than return ""
++        if (doc) return *doc; else return ""; // TODO: There surely is a better solution than return ""
 +    }
 +    NIXC_CATCH_ERRS_NULL
 +}
