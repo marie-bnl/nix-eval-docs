@@ -1,6 +1,7 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "https://channels.nixos.org/nixos-26.05/nixexprs.tar.xz";
+    nix.url = "github:NixOS/nix/2.35.2";
   };
 
   outputs = { self, nixpkgs, nix, ... }:
@@ -12,8 +13,43 @@
       };
     in
     {
-      packages.${system}.nix-patched = pkgs.nixVersions.nix_2_35.appendPatches [
-        ./patches/nix-get-value-doc.patch
-      ];
+      packages.${system} = {
+        nix-patched = nix.packages.${system}.nix-everything.appendPatches [
+          ./patches/nix-get-value-doc.patch
+        ];
+
+        nix-patched-ccache = (nix.packages.${system}.nix-everything.overrideScope (_: _: {
+          stdenv = pkgs.ccacheStdenv.override {
+            extraConfig = ''
+              export CCACHE_COMPRESS=1
+              export CCACHE_SLOPPINESS=random_seed
+              export CCACHE_DIR=/ccache
+              export CCACHE_UMASK=007
+            '';
+          };
+        })).appendPatches [
+          ./patches/nix-get-value-doc.patch
+        ];
+      };
+
+      apps.${system}.nix-patched-ccache-builder = {
+        type = "app";
+        program =
+          let
+            builder = pkgs.writeShellScript "nix-patched-ccache-builder" ''
+              [ -z "$1" ] && echo "Please set number of cores (see README)" && exit 1
+
+              ccache_dir="/var/tmp/nix-eval-docs-ccache"
+              mkdir -p "$ccache_dir"
+              chmod 777 "$ccache_dir"
+
+              nix build \
+                  --option cores $1 \
+                  --option sandbox-paths "/ccache=$ccache_dir" \
+                  path:.#nix-patched-ccache
+            '';
+          in
+          "${builder}";
+      };
     };
 }

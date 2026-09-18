@@ -1,8 +1,17 @@
 ## Building
 
+### Normal
+
 ```
-nix build .#nix-patched
+nix build path:.#nix-patched
 ```
 
-- Or use `path:.#nix-patched` to test uncommitted changes
-- You can add `--option cores n` if the build eats too much RAM
+### CCache
+
+This will use `/var/tmp/nix-eval-docs-ccache` which it will create if it doesn't exist and set its permissions to `777`.
+
+```
+nix run path:.#nix-patched-ccache-builder 4
+```
+
+Where 4 is the number of cores to build with.
