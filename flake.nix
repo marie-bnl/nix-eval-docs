@@ -20,9 +20,10 @@
               ./patches/nix-get-value-doc.patch
             ];
 
-            mesonComponentOverrides = pkgs.lib.composeExtensions prev.mesonComponentOverrides (_: _: {
-              doCheck = false;
-            });
+            mesonComponentOverrides =
+              pkgs.lib.composeExtensions prev.mesonComponentOverrides (_: _: {
+                doCheck = false;
+              });
           });
 
         nix-patched-ccache = nix-patched.overrideScope (_: _: {
