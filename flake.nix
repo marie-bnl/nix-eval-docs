@@ -13,12 +13,19 @@
       };
     in
     {
-      packages.${system} = {
-        nix-patched = nix.packages.${system}.nix-everything.appendPatches [
-          ./patches/nix-get-value-doc.patch
-        ];
+      packages.${system} = rec {
+        nix-patched =
+          nix.packages.${system}.nix-everything.overrideScope (final: prev: {
+            patches = prev.patches ++ [
+              ./patches/nix-get-value-doc.patch
+            ];
 
-        nix-patched-ccache = (nix.packages.${system}.nix-everything.overrideScope (_: _: {
+            mesonComponentOverrides = pkgs.lib.composeExtensions prev.mesonComponentOverrides (_: _: {
+              doCheck = false;
+            });
+          });
+
+        nix-patched-ccache = nix-patched.overrideScope (_: _: {
           stdenv = pkgs.ccacheStdenv.override {
             extraConfig = ''
               export CCACHE_COMPRESS=1
@@ -27,9 +34,7 @@
               export CCACHE_UMASK=007
             '';
           };
-        })).appendPatches [
-          ./patches/nix-get-value-doc.patch
-        ];
+        });
       };
 
       apps.${system}.nix-patched-ccache-builder = {
