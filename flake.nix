@@ -56,5 +56,17 @@
           in
           "${builder}";
       };
+
+      devShells.${system} = {
+        default = import ./flake/shell.nix {
+          inherit pkgs;
+          nix = self.packages.${system}.nix-patched;
+        };
+
+        ccache = import ./flake/shell.nix {
+          inherit pkgs;
+          nix = self.packages.${system}.nix-patched-ccache;
+        };
+      };
     };
 }
