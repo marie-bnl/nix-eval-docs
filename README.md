@@ -1,3 +1,7 @@
+# Nix evaluation-based documentation
+
+See https://github.com/nix-community/nixdoc/issues/167.
+
 ## Building
 
 - Build the patched Nix: `nix build path:.#nix-patched`
