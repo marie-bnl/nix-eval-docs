@@ -6,7 +6,7 @@
 }:
 
 stdenv.mkDerivation {
-  name = "nix-eval-docs-c-doc";
+  name = "nix-eval-docs-cpp-doc";
 
   src = ./src;
 

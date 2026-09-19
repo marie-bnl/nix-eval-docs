@@ -49,11 +49,11 @@
             '';
           });
 
-          c-doc = pkgs.callPackage ./c-doc/package.nix {
+          cpp-doc = pkgs.callPackage ./cpp-doc/package.nix {
             nix-patched = self.packages.${system}.nix-patched;
           };
 
-          c-doc-ccache = pkgs.callPackage ./c-doc/package.nix {
+          cpp-doc-ccache = pkgs.callPackage ./cpp-doc/package.nix {
             nix-patched = self.packages.${system}.nix-patched-ccache;
           };
         };
