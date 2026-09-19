@@ -1,8 +1,8 @@
 diff --git a/src/libexpr-c/nix_api_expr_internal.h b/src/libexpr-c/nix_api_expr_internal.h
-index 16b32bf..e2fd479 100644
+index 3f7e4bf..1bb75d1 100644
 --- a/src/libexpr-c/nix_api_expr_internal.h
 +++ b/src/libexpr-c/nix_api_expr_internal.h
-@@ -73,6 +73,11 @@ struct nix_realised_string
+@@ -72,6 +72,11 @@ struct nix_realised_string
      std::vector<StorePath> storePaths;
  };
  
@@ -13,16 +13,17 @@ index 16b32bf..e2fd479 100644
 +
  } // extern "C"
  
- // Shared helpers for validating nix_value [in] parameters across libexpr-c translation units.
+ #endif // NIX_API_EXPR_INTERNAL_H
 diff --git a/src/libexpr-c/nix_api_value.cc b/src/libexpr-c/nix_api_value.cc
-index 0b1bc45..48c3f63 100644
+index 3cb5705..85efc1e 100644
 --- a/src/libexpr-c/nix_api_value.cc
 +++ b/src/libexpr-c/nix_api_value.cc
-@@ -722,4 +722,19 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
+@@ -757,4 +757,27 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
      return &s->storePaths[i];
  }
  
-+nix_doc * nix_get_value_doc(nix_c_context * context, EvalState * state, nix_value * value)
++nix_doc *
++nix_get_value_doc(nix_c_context * context, EvalState * state, nix_value * value)
 +{
 +    if (context)
 +        context->last_err_code = NIX_OK;
@@ -37,25 +38,35 @@ index 0b1bc45..48c3f63 100644
 +    NIXC_CATCH_ERRS_NULL
 +}
 +
++const char *
++nix_get_doc_content(nix_doc * doc)
++{
++    return doc->doc.doc;
++}
++
++
  } // extern "C"
 diff --git a/src/libexpr-c/nix_api_value.h b/src/libexpr-c/nix_api_value.h
-index 0220bf6..0966b03 100644
+index 0220bf6..73efd14 100644
 --- a/src/libexpr-c/nix_api_value.h
 +++ b/src/libexpr-c/nix_api_value.h
-@@ -106,6 +106,7 @@ typedef enum {
- 
+@@ -107,6 +107,7 @@ typedef enum {
  // forward declarations
  typedef struct nix_value nix_value;
-+typedef struct nix_doc nix_doc;
  typedef struct EvalState EvalState;
++typedef struct nix_doc nix_doc;
  
  /** @deprecated Use nix_value instead */
-@@ -731,6 +732,9 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
+ [[deprecated("use nix_value instead")]] typedef nix_value Value;
+@@ -731,6 +732,12 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
   */
  void nix_realised_string_free(nix_realised_string * realised_string);
  
-+/** TODO: Write doc */
-+nix_doc * nix_get_value_doc(nix_c_context * context, EvalState * state, nix_value * value);
++nix_doc *
++nix_get_value_doc(nix_c_context * context, EvalState * state, nix_value * value);
++
++const char *
++nix_get_doc_content(nix_doc * doc);
 +
  // cffi end
  #ifdef __cplusplus

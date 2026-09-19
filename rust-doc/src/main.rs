@@ -43,7 +43,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             sum_attr_ptr,
         );
 
-        println!("{:#?}", (*sum_doc));
+        let sum_doc_str = std::ffi::CStr::from_ptr(
+            sys::nix_get_doc_content(sum_doc)
+        );
+
+        println!("{}", sum_doc_str.to_str()?);
     }
 
     Ok(())
