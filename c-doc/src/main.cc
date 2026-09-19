@@ -37,6 +37,7 @@ int main() {
       "sum"
    );
 
+   // error: 'nix_get_value_doc' was not declared in this scope
    auto sum_doc = nix_get_value_doc(
       ctx,
       state,
