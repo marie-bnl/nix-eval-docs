@@ -36,6 +36,10 @@
             '';
           };
         });
+
+        c-doc-ccache = pkgs.callPackage ./c-doc/package.nix {
+          nix-patched = self.packages.${system}.nix-patched-ccache;
+        };
       };
 
       apps.${system}.nix-patched-ccache-builder = {
