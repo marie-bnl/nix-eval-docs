@@ -59,12 +59,12 @@
       };
 
       devShells.${system} = {
-        default = import ./flake/shell.nix {
+        rust = import ./rust-doc/flake/shell.nix {
           inherit pkgs;
           nix = self.packages.${system}.nix-patched;
         };
 
-        ccache = import ./flake/shell.nix {
+        rust-ccache = import ./rust-doc/flake/shell.nix {
           inherit pkgs;
           nix = self.packages.${system}.nix-patched-ccache;
         };
