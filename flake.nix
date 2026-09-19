@@ -13,24 +13,42 @@
       };
     in
     {
-      packages.${system} = {
-        nix-patched = nix.packages.${system}.nix-everything.appendPatches [
-          ./patches/nix-get-value-doc.patch
-        ];
+      packages.${system} =
+        let
+          disableChecks = nix:
+            nix.overrideAllMesonComponents (_: _: {
+              doCheck = false;
+            });
 
-        nix-patched-ccache = (nix.packages.${system}.nix-everything.overrideScope (_: _: {
-          stdenv = pkgs.ccacheStdenv.override {
+          overrideStdenv = stdenv: nix:
+            nix.overrideScope (_: _: {
+              inherit stdenv;
+            });
+
+          patchSource = nix:
+            nix.appendPatches [
+              ./patches/nix-get-value-doc.patch
+            ];
+
+          nixForStdenv = stdenv:
+            pkgs.lib.pipe nix.packages.${system}.nix-everything [
+              disableChecks
+              (overrideStdenv stdenv)
+              patchSource
+            ];
+        in
+        {
+          nix-patched = nixForStdenv pkgs.stdenv;
+
+          nix-patched-ccache = nixForStdenv (pkgs.ccacheStdenv.override {
             extraConfig = ''
               export CCACHE_COMPRESS=1
               export CCACHE_SLOPPINESS=random_seed
               export CCACHE_DIR=/ccache
               export CCACHE_UMASK=007
             '';
-          };
-        })).appendPatches [
-          ./patches/nix-get-value-doc.patch
-        ];
-      };
+          });
+        };
 
       apps.${system}.nix-patched-ccache-builder = {
         type = "app";
