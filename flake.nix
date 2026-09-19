@@ -48,14 +48,6 @@
               export CCACHE_UMASK=007
             '';
           });
-
-          cpp-doc = pkgs.callPackage ./cpp-doc/package.nix {
-            nix-patched = self.packages.${system}.nix-patched;
-          };
-
-          cpp-doc-ccache = pkgs.callPackage ./cpp-doc/package.nix {
-            nix-patched = self.packages.${system}.nix-patched-ccache;
-          };
         };
 
       apps.${system}.nix-patched-ccache-builder = {
