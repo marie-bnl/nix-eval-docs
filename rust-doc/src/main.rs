@@ -37,14 +37,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             key_c.as_ptr(),
         );
 
-        // error[E0425]: cannot find function `nix_get_value_doc` in module `sys`
         let sum_doc = sys::nix_get_value_doc(
             ctx_ptr,
             state_ptr,
-            value_ptr,
+            sum_attr_ptr,
         );
 
-        println!("{}", sum_doc.doc);
+        println!("{:#?}", (*sum_doc));
     }
 
     Ok(())
