@@ -86,7 +86,7 @@
 
         rust-ccache = import ./rust-doc/flake/shell.nix {
           inherit pkgs;
-          nix = self.packages.${system}.nix-patched;
+          nix = self.packages.${system}.nix-patched-ccache;
         };
       };
     };
