@@ -48,6 +48,10 @@
               export CCACHE_UMASK=007
             '';
           });
+
+          c-doc = pkgs.callPackage ./c-doc/package.nix {
+            nix-patched = self.packages.${system}.nix-patched;
+          };
         };
 
       apps.${system}.nix-patched-ccache-builder = {
@@ -68,6 +72,13 @@
             '';
           in
           "${builder}";
+      };
+
+      devShells.${system} = {
+        rust = import ./rust-doc/flake/shell.nix {
+          inherit pkgs;
+          nix = self.packages.${system}.nix-patched;
+        };
       };
     };
 }
