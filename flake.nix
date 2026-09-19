@@ -52,6 +52,10 @@
           c-doc = pkgs.callPackage ./c-doc/package.nix {
             nix-patched = self.packages.${system}.nix-patched;
           };
+
+          c-doc-ccache = pkgs.callPackage ./c-doc/package.nix {
+            nix-patched = self.packages.${system}.nix-patched-ccache;
+          };
         };
 
       apps.${system}.nix-patched-ccache-builder = {
@@ -76,6 +80,11 @@
 
       devShells.${system} = {
         rust = import ./rust-doc/flake/shell.nix {
+          inherit pkgs;
+          nix = self.packages.${system}.nix-patched;
+        };
+
+        rust-ccache = import ./rust-doc/flake/shell.nix {
           inherit pkgs;
           nix = self.packages.${system}.nix-patched;
         };
