@@ -1,10 +1,9 @@
 {
-  rustPlatform,
-  nix,
   pkg-config,
   rustc,
-  makeSetupHook,
-  applyPatches,
+  rustPlatform,
+
+  nix,
   nix-bindings,
 }:
 
