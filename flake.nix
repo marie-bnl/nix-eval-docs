@@ -2,14 +2,23 @@
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixos-26.05/nixexprs.tar.xz";
     nix.url = "github:NixOS/nix/2.35.2";
+    nix-bindings.url = "github:NotAShelf/nix-bindings/?tag=2.2352.0";
   };
 
-  outputs = { self, nixpkgs, nix, ... }:
+  outputs = { self, nixpkgs, nix, nix-bindings, ... }:
     let
       system = "x86_64-linux";
 
       pkgs = import nixpkgs {
         inherit system;
+      };
+
+      nix-bindings-patched = pkgs.applyPatches {
+        name = "nix-bindings-source";
+        src = nix-bindings;
+        patches = [
+          ./patches/nix-bindings-get-doc.patch
+        ];
       };
     in
     {
@@ -36,6 +45,12 @@
               (overrideStdenv stdenv)
               patchSource
             ];
+
+          rustTestForNix = nix:
+            pkgs.callPackage ./rust-doc/package.nix {
+              inherit nix;
+              nix-bindings = nix-bindings-patched;
+            };
         in
         {
           nix-patched = nixForStdenv pkgs.stdenv;
@@ -48,6 +63,12 @@
               export CCACHE_UMASK=007
             '';
           });
+
+          rust-test =
+            rustTestForNix self.packages.${system}.nix-patched;
+
+          rust-test-ccache =
+            rustTestForNix self.packages.${system}.nix-patched-ccache;
         };
 
       apps.${system}.nix-patched-ccache-builder = {
@@ -68,18 +89,6 @@
             '';
           in
           "${builder}";
-      };
-
-      devShells.${system} = {
-        rust = import ./rust-doc/flake/shell.nix {
-          inherit pkgs;
-          nix = self.packages.${system}.nix-patched;
-        };
-
-        rust-ccache = import ./rust-doc/flake/shell.nix {
-          inherit pkgs;
-          nix = self.packages.${system}.nix-patched-ccache;
-        };
       };
     };
 }

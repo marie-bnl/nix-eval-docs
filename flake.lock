@@ -88,6 +88,24 @@
         "type": "github"
       }
     },
+    "nix-bindings": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1789831165,
+        "narHash": "sha256-VJDCxrqSZnC75iFO/AXnA64hMULrfsNNRPYESo7YTRc=",
+        "owner": "NotAShelf",
+        "repo": "nix-bindings",
+        "rev": "2430091ad0602c5eac8a9aa39c388865d3fd70b7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NotAShelf",
+        "repo": "nix-bindings",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1782535326,
@@ -135,6 +153,19 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1789684949,
+        "narHash": "sha256-TAKa57gfBM/9a4IZrFaIQZhnHs9mXIFPlZbYrvhnaMY=",
+        "rev": "e554fab72f81915600f3f449b786fd9af40439a5",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1075591.e554fab72f81/nixexprs.tar.zst"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://channels.nixos.org/nixos-unstable/nixexprs.tar.zst"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1789654592,
         "narHash": "sha256-a0J/BOBKhTv1G1v10+KTda4z88xdsPB1tw/kwAFLfCc=",
         "rev": "ecc58f32d1069a3e3f8a991e2233d365689f748d",
@@ -149,7 +180,8 @@
     "root": {
       "inputs": {
         "nix": "nix",
-        "nixpkgs": "nixpkgs_2"
+        "nix-bindings": "nix-bindings",
+        "nixpkgs": "nixpkgs_3"
       }
     }
   },
