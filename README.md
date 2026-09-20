@@ -4,8 +4,8 @@ See https://github.com/nix-community/nixdoc/issues/167.
 
 ## Roadmap
 
-- [x] Working evaluation-based documentation generation
-- [ ] Functions to access other `doc` fields
+- [x] Functions to get a doc comment's content from a value after evaluation
+- [ ] Functions to access `doc` fields other than content
 - [ ] **Safety in nix-bindings patch**
 - [ ] Nix patch to generate `doc` on lambdas outside attrs
     - [ ] Generate `doc` on non-lambda values?
