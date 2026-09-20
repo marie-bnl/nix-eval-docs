@@ -2,18 +2,30 @@
 
 See https://github.com/nix-community/nixdoc/issues/167.
 
+## Roadmap
+
+- [x] Working evaluation-based documentation generation
+- [ ] Functions to access other `doc` fields
+- [ ] **Safety in nix-bindings patch**
+- [ ] Nix patch to generate `doc` on lambdas outside attrs
+    - [ ] Generate `doc` on non-lambda values?
+- [ ] Unit tests
+- [ ] Implement in `nixdoc`
+
 ## Building
 
+> [!NOTE]  
+> Building without CCache is untested. It should work because it's mainly just the same outputs as CCache but using `nix-patched` instead of `nix-patched-cccache` and both are generated the exact same way, just changing the `stdenv`. But if you get issues it might be worth trying building with CCache.
+
 - Build the patched Nix: `nix build path:.#nix-patched`
-- Enter the Rust devshell: `nix develop path:.#rust`
+- Build the Rust test doc generator: `nix build path:.#rust`
 
 ### CCache
 
-> [!WARNING]
+> [!WARNING]  
 > The `nix-patched-ccache-builder` will use the `/var/tmp/nix-eval-docs-ccache` directory which it will create if it doesn't exist and set its permissions to `777`.
 
 - Build the patched Nix: `nix run path:.#nix-patched-ccache-builder "$CORE_NUMBER"`
-- Enter the Rust devshell `nix develop path:.#rust-ccache`
+- Build the Rust test doc generator `nix build path:.#rust-ccache`
 
-> [!IMPORTANT]
-> Because `nix-patched-ccache-builder` uses a custom build script, entering the Rust devshell requires having built the patched Nix once since the latest change to `nix-patched`.
+Because `nix-patched-ccache-builder` uses a custom build script, building the Rust test requires having built the patched Nix once since the latest change to `nix-patched`. If you run into `ccache: error: Permission denied` that's why.
