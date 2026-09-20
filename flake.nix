@@ -64,10 +64,10 @@
             '';
           });
 
-          rust-test =
+          rust =
             rustTestForNix self.packages.${system}.nix-patched;
 
-          rust-test-ccache =
+          rust-ccache =
             rustTestForNix self.packages.${system}.nix-patched-ccache;
         };
 
