@@ -15,10 +15,10 @@ index 3f7e4bf..1bb75d1 100644
  
  #endif // NIX_API_EXPR_INTERNAL_H
 diff --git a/src/libexpr-c/nix_api_value.cc b/src/libexpr-c/nix_api_value.cc
-index 3cb5705..85efc1e 100644
+index 3cb5705..9ebbf46 100644
 --- a/src/libexpr-c/nix_api_value.cc
 +++ b/src/libexpr-c/nix_api_value.cc
-@@ -757,4 +757,27 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
+@@ -757,4 +757,48 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
      return &s->storePaths[i];
  }
  
@@ -38,16 +38,37 @@ index 3cb5705..85efc1e 100644
 +    NIXC_CATCH_ERRS_NULL
 +}
 +
-+const char *
-+nix_get_doc_content(nix_doc * doc)
++const char * nix_get_doc_name(nix_doc * doc)
++{
++    auto name = doc->doc.name;
++    if (name)
++        return name->c_str();
++    return nullptr;
++}
++
++size_t nix_get_doc_arity(nix_doc * doc)
++{
++    return doc->doc.arity;
++}
++
++size_t nix_get_doc_args_size(nix_doc * doc)
++{
++    return doc->doc.args.size();
++}
++
++const char * nix_get_doc_arg_by_idx(nix_doc * doc, size_t index)
++{
++    return doc->doc.args[index].c_str();
++}
++
++const char * nix_get_doc_content(nix_doc * doc)
 +{
 +    return doc->doc.doc;
 +}
 +
-+
  } // extern "C"
 diff --git a/src/libexpr-c/nix_api_value.h b/src/libexpr-c/nix_api_value.h
-index 0220bf6..88da385 100644
+index 0220bf6..1ff828e 100644
 --- a/src/libexpr-c/nix_api_value.h
 +++ b/src/libexpr-c/nix_api_value.h
 @@ -107,6 +107,7 @@ typedef enum {
@@ -58,7 +79,7 @@ index 0220bf6..88da385 100644
  
  /** @deprecated Use nix_value instead */
  [[deprecated("use nix_value instead")]] typedef nix_value Value;
-@@ -731,6 +732,22 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
+@@ -731,6 +732,46 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
   */
  void nix_realised_string_free(nix_realised_string * realised_string);
  
@@ -71,12 +92,36 @@ index 0220bf6..88da385 100644
 +nix_doc *
 +nix_get_value_doc(nix_c_context * context, EvalState * state, nix_value * value);
 +
++/** @brief Get a documentation's name
++ * @param[in] doc the documentation object
++ * @return the documentation's name
++ */
++const char * nix_get_doc_name(nix_doc * doc);
++
++/** @brief Get a documentation's arity
++ * @param[in] doc the documentation object
++ * @return the documentation's arity
++ */
++size_t nix_get_doc_arity(nix_doc * doc);
++
++/** @brief Get the number of arguments for documentation
++ * @param[in] doc the documentation object
++ * @return the arguments size
++ */
++size_t nix_get_doc_args_size(nix_doc * doc);
++
++/** @brief Get an argument of documentation by index
++ * @param[in] doc the documentation object
++ * @param[in] index the argument index
++ * @return the argument
++ */
++const char * nix_get_doc_arg_by_idx(nix_doc * doc, size_t index);
++
 +/** @brief Get a documentation's content
 + * @param[in] doc the documentation object
 + * @return the documentation's content
 + */
-+const char *
-+nix_get_doc_content(nix_doc * doc);
++const char * nix_get_doc_content(nix_doc * doc);
 +
  // cffi end
  #ifdef __cplusplus

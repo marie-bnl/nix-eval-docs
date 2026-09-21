@@ -5,7 +5,9 @@ See https://github.com/nix-community/nixdoc/issues/167.
 ## Roadmap
 
 - [x] Functions to get a doc comment's content from a value after evaluation
-- [ ] Functions to access `doc` fields other than content
+- [x] Getters for other `doc` fields (name, args, arity)
+    - [ ] Test them with valid values
+- [ ] Documentation for created nix-bindings functions
 - [ ] **Safety in nix-bindings patch**
 - [ ] Nix patch to generate `doc` on lambdas outside attrs
     - [ ] Generate `doc` on non-lambda values?

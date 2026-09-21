@@ -14,7 +14,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     ", "<eval>")?;
 
-    println!("{}", result.get_attr("sum")?.get_doc()?);
+    let sum_attr = result.get_attr("sum")?;
+
+    println!(
+        "
+            Documentation for `sum`
+            Doc name: {:?}
+            Doc args: {:?}
+            Doc arity: {:?}
+            Doc content: {:?}
+        ",
+        sum_attr.get_doc_name(),
+        sum_attr.get_doc_args(),
+        sum_attr.get_doc_arity(),
+        sum_attr.get_doc_content(),
+    );
 
     Ok(())
 }

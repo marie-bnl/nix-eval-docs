@@ -1,15 +1,13 @@
 diff --git a/nix-bindings/src/value.rs b/nix-bindings/src/value.rs
-index 80c9fd2..8dc9a40 100644
+index 80c9fd2..a6945da 100644
 --- a/nix-bindings/src/value.rs
 +++ b/nix-bindings/src/value.rs
-@@ -592,6 +592,32 @@ impl<'a> Value<'a> {
+@@ -592,6 +592,64 @@ impl<'a> Value<'a> {
        ValueType::External => Ok("<external>".to_string()),
      }
    }
 +
-+  pub fn get_doc(&self) -> Result<String> {
-+    // TODO: CHECK SAFETY
-+
++  fn get_doc_ptr(&self) -> Result<*mut sys::nix_doc> {
 +    let doc_ptr = unsafe {
 +      sys::nix_get_value_doc(
 +        self.state.context.as_ptr(),
@@ -22,15 +20,49 @@ index 80c9fd2..8dc9a40 100644
 +      return Err(Error::NullPointer);
 +    }
 +
-+    let doc_content_ptr = unsafe {
-+      sys::nix_get_doc_content(doc_ptr)
-+    };
++    Ok(doc_ptr)
++  }
 +
-+    let doc_content = unsafe { CStr::from_ptr(doc_content_ptr) }
++  pub fn get_doc_name(&self) -> Result<String> {
++    let name_ptr = unsafe { sys::nix_get_doc_name(self.get_doc_ptr()?) };
++
++    if name_ptr.is_null() {
++      return Err(Error::NullPointer);
++    }
++
++    let name = unsafe { CStr::from_ptr(name_ptr) }
 +      .to_string_lossy()
 +      .into_owned();
 +
-+    Ok(doc_content)
++    Ok(name)
++  }
++
++  pub fn get_doc_arity(&self) -> Result<usize> {
++    Ok(unsafe { sys::nix_get_doc_arity(self.get_doc_ptr()?) })
++  }
++
++  pub fn get_doc_args(&self) -> Result<Vec<String>> {
++    let doc_ptr = self.get_doc_ptr()?;
++
++    let args_size = unsafe { sys::nix_get_doc_args_size(doc_ptr) };
++
++    let args: Vec<String> = (0..args_size).map(|i|
++      unsafe { CStr::from_ptr(sys::nix_get_doc_arg_by_idx(doc_ptr, i)) }
++        .to_string_lossy()
++        .into_owned()
++    ).collect();
++
++    Ok(args)
++  }
++
++  pub fn get_doc_content(&self) -> Result<String> {
++    let content_ptr = unsafe { sys::nix_get_doc_content(self.get_doc_ptr()?) };
++
++    let content = unsafe { CStr::from_ptr(content_ptr) }
++      .to_string_lossy()
++      .into_owned();
++
++    Ok(content)
 +  }
  }
  
