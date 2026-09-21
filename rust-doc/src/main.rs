@@ -21,12 +21,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Documentation for `sum`
             Doc name: {:?}
             Doc args: {:?}
-            Doc arity: {:?}
             Doc content: {:?}
         ",
         sum_attr.get_doc_name(),
         sum_attr.get_doc_args(),
-        sum_attr.get_doc_arity(),
         sum_attr.get_doc_content(),
     );
 

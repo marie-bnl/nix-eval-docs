@@ -1,8 +1,8 @@
 diff --git a/nix-bindings/src/value.rs b/nix-bindings/src/value.rs
-index 80c9fd2..a6945da 100644
+index 80c9fd2..3ec6eff 100644
 --- a/nix-bindings/src/value.rs
 +++ b/nix-bindings/src/value.rs
-@@ -592,6 +592,64 @@ impl<'a> Value<'a> {
+@@ -592,6 +592,60 @@ impl<'a> Value<'a> {
        ValueType::External => Ok("<external>".to_string()),
      }
    }
@@ -35,10 +35,6 @@ index 80c9fd2..a6945da 100644
 +      .into_owned();
 +
 +    Ok(name)
-+  }
-+
-+  pub fn get_doc_arity(&self) -> Result<usize> {
-+    Ok(unsafe { sys::nix_get_doc_arity(self.get_doc_ptr()?) })
 +  }
 +
 +  pub fn get_doc_args(&self) -> Result<Vec<String>> {

@@ -15,10 +15,10 @@ index 3f7e4bf..1bb75d1 100644
  
  #endif // NIX_API_EXPR_INTERNAL_H
 diff --git a/src/libexpr-c/nix_api_value.cc b/src/libexpr-c/nix_api_value.cc
-index 3cb5705..6268503 100644
+index 3cb5705..a21c105 100644
 --- a/src/libexpr-c/nix_api_value.cc
 +++ b/src/libexpr-c/nix_api_value.cc
-@@ -757,4 +757,48 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
+@@ -757,4 +757,43 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
      return &s->storePaths[i];
  }
  
@@ -46,11 +46,6 @@ index 3cb5705..6268503 100644
 +    return nullptr;
 +}
 +
-+size_t nix_get_doc_arity(nix_doc * doc)
-+{
-+    return doc->doc.arity;
-+}
-+
 +size_t nix_get_doc_args_size(nix_doc * doc)
 +{
 +    return doc->doc.args.size();
@@ -68,7 +63,7 @@ index 3cb5705..6268503 100644
 +
  } // extern "C"
 diff --git a/src/libexpr-c/nix_api_value.h b/src/libexpr-c/nix_api_value.h
-index 0220bf6..1ff828e 100644
+index 0220bf6..764aa71 100644
 --- a/src/libexpr-c/nix_api_value.h
 +++ b/src/libexpr-c/nix_api_value.h
 @@ -107,6 +107,7 @@ typedef enum {
@@ -79,7 +74,7 @@ index 0220bf6..1ff828e 100644
  
  /** @deprecated Use nix_value instead */
  [[deprecated("use nix_value instead")]] typedef nix_value Value;
-@@ -731,6 +732,46 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
+@@ -731,6 +732,40 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
   */
  void nix_realised_string_free(nix_realised_string * realised_string);
  
@@ -97,12 +92,6 @@ index 0220bf6..1ff828e 100644
 + * @return the documentation's name
 + */
 +const char * nix_get_doc_name(nix_doc * doc);
-+
-+/** @brief Get a documentation's arity
-+ * @param[in] doc the documentation object
-+ * @return the documentation's arity
-+ */
-+size_t nix_get_doc_arity(nix_doc * doc);
 +
 +/** @brief Get the number of arguments for documentation
 + * @param[in] doc the documentation object
