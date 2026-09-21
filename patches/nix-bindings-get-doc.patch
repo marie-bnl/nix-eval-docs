@@ -1,30 +1,26 @@
-diff --git a/nix-bindings/src/value.rs b/nix-bindings/src/value.rs
-index 80c9fd2..3ec6eff 100644
---- a/nix-bindings/src/value.rs
-+++ b/nix-bindings/src/value.rs
-@@ -592,6 +592,60 @@ impl<'a> Value<'a> {
-       ValueType::External => Ok("<external>".to_string()),
-     }
-   }
+diff --git a/nix-bindings/src/doc.rs b/nix-bindings/src/doc.rs
+new file mode 100644
+index 0000000..e825d67
+--- /dev/null
++++ b/nix-bindings/src/doc.rs
+@@ -0,0 +1,53 @@
++// TODO: ADD SAFETY CHECKS
 +
-+  fn get_doc_ptr(&self) -> Result<*mut sys::nix_doc> {
-+    let doc_ptr = unsafe {
-+      sys::nix_get_value_doc(
-+        self.state.context.as_ptr(),
-+        self.state.as_ptr(),
-+        self.inner.as_ptr(),
-+      )
-+    };
++use std::{ffi::CStr, ptr::NonNull};
 +
-+    if doc_ptr.is_null() {
-+      return Err(Error::NullPointer);
-+    }
++use crate::{
++  Error,
++  Result,
++  sys,
++};
 +
-+    Ok(doc_ptr)
-+  }
++pub struct Doc {
++  pub(crate) inner: NonNull<sys::nix_doc>,
++}
 +
-+  pub fn get_doc_name(&self) -> Result<String> {
-+    let name_ptr = unsafe { sys::nix_get_doc_name(self.get_doc_ptr()?) };
++impl Doc {
++  pub fn get_name(&self) -> Result<String> {
++    let name_ptr = unsafe { sys::nix_get_doc_name(self.inner.as_ptr()) };
 +
 +    if name_ptr.is_null() {
 +      return Err(Error::NullPointer);
@@ -37,13 +33,13 @@ index 80c9fd2..3ec6eff 100644
 +    Ok(name)
 +  }
 +
-+  pub fn get_doc_args(&self) -> Result<Vec<String>> {
-+    let doc_ptr = self.get_doc_ptr()?;
-+
-+    let args_size = unsafe { sys::nix_get_doc_args_size(doc_ptr) };
++  pub fn get_args(&self) -> Result<Vec<String>> {
++    let args_size = unsafe { sys::nix_get_doc_args_size(self.inner.as_ptr()) };
 +
 +    let args: Vec<String> = (0..args_size).map(|i|
-+      unsafe { CStr::from_ptr(sys::nix_get_doc_arg_by_idx(doc_ptr, i)) }
++      unsafe { CStr::from_ptr(
++        sys::nix_get_doc_arg_by_idx(self.inner.as_ptr(), i)
++      ) }
 +        .to_string_lossy()
 +        .into_owned()
 +    ).collect();
@@ -51,14 +47,75 @@ index 80c9fd2..3ec6eff 100644
 +    Ok(args)
 +  }
 +
-+  pub fn get_doc_content(&self) -> Result<String> {
-+    let content_ptr = unsafe { sys::nix_get_doc_content(self.get_doc_ptr()?) };
++  pub fn get_content(&self) -> Result<String> {
++    let content_ptr = unsafe { sys::nix_get_doc_content(self.inner.as_ptr()) };
 +
 +    let content = unsafe { CStr::from_ptr(content_ptr) }
 +      .to_string_lossy()
 +      .into_owned();
 +
 +    Ok(content)
++  }
++}
+diff --git a/nix-bindings/src/lib.rs b/nix-bindings/src/lib.rs
+index dadba98..98fbf8f 100644
+--- a/nix-bindings/src/lib.rs
++++ b/nix-bindings/src/lib.rs
+@@ -147,12 +147,14 @@ pub use context::{Context, Verbosity, is_pure_eval, nix_version};
+ #[cfg(feature = "store")]
+ pub use store::{Derivation, Store, StorePath};
+ 
++#[cfg(feature = "expr")] mod doc;
+ #[cfg(feature = "expr")] mod attrs;
+ #[cfg(feature = "expr")] mod eval;
+ #[cfg(feature = "expr")] mod lists;
+ #[cfg(feature = "expr")] mod value;
+ #[cfg(feature = "expr")] mod value_ops;
+ 
++#[cfg(feature = "expr")] pub use doc::Doc;
+ #[cfg(feature = "expr")]
+ pub use eval::{EvalState, EvalStateBuilder};
+ #[cfg(feature = "expr")] pub use value::{Value, ValueType};
+diff --git a/nix-bindings/src/value.rs b/nix-bindings/src/value.rs
+index 80c9fd2..50a8c80 100644
+--- a/nix-bindings/src/value.rs
++++ b/nix-bindings/src/value.rs
+@@ -6,6 +6,7 @@
+ use std::{ffi::CStr, fmt, ptr::NonNull, sync::Arc};
+ 
+ use crate::{
++  Doc,
+   Error,
+   EvalState,
+   Result,
+@@ -592,6 +593,31 @@ impl<'a> Value<'a> {
+       ValueType::External => Ok("<external>".to_string()),
+     }
+   }
++
++  pub fn get_doc(&self) -> Result<Doc> {
++    if self.value_type() != ValueType::Function {
++      return Err(Error::InvalidType {
++        expected: "function",
++        actual:   self.value_type().to_string(),
++      });
++    }
++
++    let doc_ptr = unsafe {
++      sys::nix_get_value_doc(
++        self.state.context.as_ptr(),
++        self.state.as_ptr(),
++        self.inner.as_ptr(),
++      )
++    };
++
++    if doc_ptr.is_null() {
++      return Err(Error::NullPointer);
++    }
++
++    let inner = NonNull::new(doc_ptr).ok_or(Error::NullPointer)?;
++
++    Ok(Doc { inner })
 +  }
  }
  
