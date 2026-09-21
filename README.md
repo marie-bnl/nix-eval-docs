@@ -2,11 +2,23 @@
 
 See https://github.com/nix-community/nixdoc/issues/167.
 
+## Important notes
+
+**Nix**
+
+- Breaking changes introduced:
+    - `EvalState::Doc::doc` renamed to `content`
+    - Field does not contain the header anymore (it is generated in repl's `:doc` instead)
+
+**Nix-bindings**
+
+- All created functions need safety checks
+
 ## Roadmap
 
 - [x] Functions to get a doc comment's content from a value after evaluation
-    - [ ] Rename Nix's `doc.doc` to smth more meaningful like `doc.content`
-    - [ ] Make `EvalState::getDoc` put only the content in it and move the "Function ... defined at ..." header generation to `nix repl`
+    - [x] Rename Nix's `doc.doc` to smth more meaningful like `doc.content`
+    - [x] Make `EvalState::getDoc` put only the content in it and move the "Function ... defined at ..." header generation to `nix repl`
 - [x] Getters for other `doc` fields
     - [ ] Getter for `pos`
     - [x] Getter implemented and tested for `name`
