@@ -15,7 +15,7 @@ index 3f7e4bf..1bb75d1 100644
  
  #endif // NIX_API_EXPR_INTERNAL_H
 diff --git a/src/libexpr-c/nix_api_value.cc b/src/libexpr-c/nix_api_value.cc
-index 3cb5705..9ebbf46 100644
+index 3cb5705..6268503 100644
 --- a/src/libexpr-c/nix_api_value.cc
 +++ b/src/libexpr-c/nix_api_value.cc
 @@ -757,4 +757,48 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
@@ -42,7 +42,7 @@ index 3cb5705..9ebbf46 100644
 +{
 +    auto name = doc->doc.name;
 +    if (name)
-+        return name->c_str();
++        return strdup(name->c_str());
 +    return nullptr;
 +}
 +
@@ -58,7 +58,7 @@ index 3cb5705..9ebbf46 100644
 +
 +const char * nix_get_doc_arg_by_idx(nix_doc * doc, size_t index)
 +{
-+    return doc->doc.args[index].c_str();
++    return strdup(doc->doc.args[index].c_str());
 +}
 +
 +const char * nix_get_doc_content(nix_doc * doc)
