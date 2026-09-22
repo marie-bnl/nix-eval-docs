@@ -25,7 +25,7 @@ See https://github.com/nix-community/nixdoc/issues/167.
     - [x] Not going to implement `arity` (see note below)
     - [x] Getter for `args`: Nix currently always returns `{}` for lambdas
         - [x] Working for PrimOps
-        - [ ] Patch Nix so it returns the arguments?
+        - [ ] Patch Nix so it returns the arguments for lambdas?
 - [ ] Write Nix tests
 - [ ] Port changes to master and open Nix PR
 - [ ] Documentation for created nix-bindings functions
