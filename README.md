@@ -29,7 +29,7 @@ See https://github.com/nix-community/nixdoc/issues/167.
 - [ ] Port changes to master and open Nix PR
 - [ ] Documentation for created nix-bindings functions
 - [ ] **Safety in nix-bindings patch**
-- [x] ~~Nix patch to generate `doc` on lambdas outside attrs~~
+- [x] ~~Nix patch to generate `doc` on lambdas outside attrs and non-lambda values~~
     - [x] Actually it's already the case
     - [ ] Remove function assertions
 - [ ] Unit tests
