@@ -14,22 +14,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     ", "<eval>")?;
 
-    let sum_attr = result.get_attr("sum")?;
-    let sum_doc = sum_attr.get_doc()?;
-    let sum_doc_pos = sum_doc.get_pos()?;
+    let attr = result.get_attr("sum")?;
+    let doc = attr.get_doc()?;
+    let pos = doc.get_pos()?;
 
     println!(
         "
             Documentation for `sum`
-            Position: {}:{}
+            Position: {:?}:{}:{}
             Name: {:?}
             Args: {:?}
             Content: {:?}
         ",
-        sum_doc_pos.get_line(), sum_doc_pos.get_column(),
-        sum_doc.get_name(),
-        sum_doc.get_args(),
-        sum_doc.get_content(),
+        pos.get_source_path(), pos.get_line(), pos.get_column(),
+        doc.get_name(),
+        doc.get_args(),
+        doc.get_content(),
     );
 
     Ok(())
