@@ -48,10 +48,10 @@ index 3f7e4bf..1bb75d1 100644
  
  #endif // NIX_API_EXPR_INTERNAL_H
 diff --git a/src/libexpr-c/nix_api_value.cc b/src/libexpr-c/nix_api_value.cc
-index 3cb5705..9eb9263 100644
+index 3cb5705..98536dc 100644
 --- a/src/libexpr-c/nix_api_value.cc
 +++ b/src/libexpr-c/nix_api_value.cc
-@@ -757,4 +757,43 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
+@@ -757,4 +757,48 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
      return &s->storePaths[i];
  }
  
@@ -69,6 +69,11 @@ index 3cb5705..9eb9263 100644
 +        return nullptr;
 +    }
 +    NIXC_CATCH_ERRS_NULL
++}
++
++nix_pos * nix_get_doc_pos(nix_doc * doc)
++{
++    return new nix_pos{.pos = doc->doc.pos};
 +}
 +
 +const char * nix_get_doc_name(nix_doc * doc)
@@ -96,18 +101,19 @@ index 3cb5705..9eb9263 100644
 +
  } // extern "C"
 diff --git a/src/libexpr-c/nix_api_value.h b/src/libexpr-c/nix_api_value.h
-index 0220bf6..764aa71 100644
+index 0220bf6..af62ed5 100644
 --- a/src/libexpr-c/nix_api_value.h
 +++ b/src/libexpr-c/nix_api_value.h
-@@ -107,6 +107,7 @@ typedef enum {
+@@ -107,6 +107,8 @@ typedef enum {
  // forward declarations
  typedef struct nix_value nix_value;
  typedef struct EvalState EvalState;
 +typedef struct nix_doc nix_doc;
++typedef struct nix_pos nix_pos;
  
  /** @deprecated Use nix_value instead */
  [[deprecated("use nix_value instead")]] typedef nix_value Value;
-@@ -731,6 +732,40 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
+@@ -731,6 +733,46 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
   */
  void nix_realised_string_free(nix_realised_string * realised_string);
  
@@ -119,6 +125,12 @@ index 0220bf6..764aa71 100644
 + */
 +nix_doc *
 +nix_get_value_doc(nix_c_context * context, EvalState * state, nix_value * value);
++
++/** @brief Get a documented function's position
++ * @param[in] doc the function's documentation
++ * @return the position object
++ */
++nix_pos * nix_get_doc_pos(nix_doc * doc);
 +
 +/** @brief Get a documentation's name
 + * @param[in] doc the documentation object
@@ -206,3 +218,86 @@ index f0a8934..c8253a3 100644
      };
  
      /**
+diff --git a/src/libutil-c/nix_api_util.cc b/src/libutil-c/nix_api_util.cc
+index f28a916..9e563d2 100644
+--- a/src/libutil-c/nix_api_util.cc
++++ b/src/libutil-c/nix_api_util.cc
+@@ -175,4 +175,14 @@ nix_err nix_set_verbosity(nix_c_context * context, nix_verbosity level)
+     NIXC_CATCH_ERRS
+ }
+ 
++uint32_t nix_get_pos_line(nix_pos * pos)
++{
++    return pos->pos.line;
++}
++
++uint32_t nix_get_pos_column(nix_pos * pos)
++{
++    return pos->pos.column;
++}
++
+ } // extern "C"
+diff --git a/src/libutil-c/nix_api_util.h b/src/libutil-c/nix_api_util.h
+index b48d916..a30c342 100644
+--- a/src/libutil-c/nix_api_util.h
++++ b/src/libutil-c/nix_api_util.h
+@@ -14,6 +14,8 @@
+  * Also contains error handling utilities
+  */
+ 
++#include <stdint.h>
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+@@ -119,6 +121,7 @@ enum nix_err {
+ };
+ 
+ typedef enum nix_err nix_err;
++typedef struct nix_pos nix_pos;
+ 
+ /**
+  * @brief Verbosity level
+@@ -363,6 +366,18 @@ void nix_clear_err(nix_c_context * context);
+  */
+ nix_err nix_set_verbosity(nix_c_context * context, nix_verbosity level);
+ 
++/** @brief Get a position's line
++ * @param[in] pos the position
++ * @return the line
++ */
++uint32_t nix_get_pos_line(nix_pos * pos);
++
++/** @brief Get a position's column
++ * @param[in] pos the position
++ * @return the column
++ */
++uint32_t nix_get_pos_column(nix_pos * pos);
++
+ /**
+  *  @}
+  */
+diff --git a/src/libutil-c/nix_api_util_internal.h b/src/libutil-c/nix_api_util_internal.h
+index e4c5e93..356ba55 100644
+--- a/src/libutil-c/nix_api_util_internal.h
++++ b/src/libutil-c/nix_api_util_internal.h
+@@ -5,6 +5,7 @@
+ #include <optional>
+ 
+ #include "nix/util/error.hh"
++#include "nix/util/position.hh"
+ #include "nix_api_util.h"
+ 
+ extern "C" {
+@@ -49,6 +50,11 @@ nix_err call_nix_get_string_callback(const std::string_view str, nix_get_string_
+     }
+ #define NIXC_CATCH_ERRS_NULL NIXC_CATCH_ERRS_RES(nullptr)
+ 
++struct nix_pos
++{
++    nix::Pos pos;
++};
++
+ } // extern "C"
+ 
+ #endif // NIX_API_UTIL_INTERNAL_H

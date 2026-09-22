@@ -1,15 +1,16 @@
 diff --git a/nix-bindings/src/doc.rs b/nix-bindings/src/doc.rs
 new file mode 100644
-index 0000000..e825d67
+index 0000000..75c1ac0
 --- /dev/null
 +++ b/nix-bindings/src/doc.rs
-@@ -0,0 +1,53 @@
+@@ -0,0 +1,64 @@
 +// TODO: ADD SAFETY CHECKS
 +
 +use std::{ffi::CStr, ptr::NonNull};
 +
 +use crate::{
 +  Error,
++  Pos,
 +  Result,
 +  sys,
 +};
@@ -19,6 +20,16 @@ index 0000000..e825d67
 +}
 +
 +impl Doc {
++  pub fn get_pos(&self) -> Result<Pos> {
++    let pos_ptr = unsafe {
++      sys::nix_get_doc_pos(self.inner.as_ptr())
++    };
++
++    let inner = NonNull::new(pos_ptr).ok_or(Error::NullPointer)?;
++
++    Ok(Pos { inner })
++  }
++
 +  pub fn get_name(&self) -> Result<String> {
 +    let name_ptr = unsafe { sys::nix_get_doc_name(self.inner.as_ptr()) };
 +
@@ -58,10 +69,10 @@ index 0000000..e825d67
 +  }
 +}
 diff --git a/nix-bindings/src/lib.rs b/nix-bindings/src/lib.rs
-index dadba98..98fbf8f 100644
+index dadba98..8d969e8 100644
 --- a/nix-bindings/src/lib.rs
 +++ b/nix-bindings/src/lib.rs
-@@ -147,12 +147,14 @@ pub use context::{Context, Verbosity, is_pure_eval, nix_version};
+@@ -147,14 +147,18 @@ pub use context::{Context, Verbosity, is_pure_eval, nix_version};
  #[cfg(feature = "store")]
  pub use store::{Derivation, Store, StorePath};
  
@@ -69,13 +80,44 @@ index dadba98..98fbf8f 100644
  #[cfg(feature = "expr")] mod attrs;
  #[cfg(feature = "expr")] mod eval;
  #[cfg(feature = "expr")] mod lists;
++#[cfg(feature = "expr")] mod pos;
  #[cfg(feature = "expr")] mod value;
  #[cfg(feature = "expr")] mod value_ops;
  
 +#[cfg(feature = "expr")] pub use doc::Doc;
  #[cfg(feature = "expr")]
  pub use eval::{EvalState, EvalStateBuilder};
++#[cfg(feature = "expr")] pub use pos::Pos;
  #[cfg(feature = "expr")] pub use value::{Value, ValueType};
+ #[cfg(feature = "expr")] pub use value_ops::NixValueOps;
+ 
+diff --git a/nix-bindings/src/pos.rs b/nix-bindings/src/pos.rs
+new file mode 100644
+index 0000000..1e405c8
+--- /dev/null
++++ b/nix-bindings/src/pos.rs
+@@ -0,0 +1,21 @@
++// TODO: ADD SAFETY CHECKS
++
++use std::{ptr::NonNull};
++
++use crate::{
++  sys,
++};
++
++pub struct Pos {
++  pub(crate) inner: NonNull<sys::nix_pos>,
++}
++
++impl Pos {
++  pub fn get_line(&self) -> u32 {
++    unsafe { sys::nix_get_pos_line(self.inner.as_ptr()) }
++  }
++
++  pub fn get_column(&self) -> u32 {
++    unsafe { sys::nix_get_pos_column(self.inner.as_ptr()) }
++  }
++}
 diff --git a/nix-bindings/src/value.rs b/nix-bindings/src/value.rs
 index 80c9fd2..50a8c80 100644
 --- a/nix-bindings/src/value.rs
