@@ -32,7 +32,7 @@ See https://github.com/nix-community/nixdoc/issues/167.
 - [ ] **Safety in nix-bindings patch**
 - [ ] Docs for single lambda and non-lambda values
     - [x] Docs for single lambda already work
-    - [ ] It seemed docs for non-lambdas was already implemented (search "constant" in https://github.com/NixOS/nix/commit/7fae378835534d2a17818fd7cd91aae91320aa03#diff-84f894eefa09f4d448f65ea95ec65bc8266f5f11ca67db66408a343ae9f8391bR26) but actually no
+    - [ ] It seemed docs for non-lambdas was already implemented (search "constant" in [NixOS/nix@7fae37](https://github.com/NixOS/nix/commit/7fae378835534d2a17818fd7cd91aae91320aa03#diff-84f894eefa09f4d448f65ea95ec65bc8266f5f11ca67db66408a343ae9f8391bR26)) but actually no
 - [ ] Unit tests
 - [ ] Implement in `nixdoc`
 
