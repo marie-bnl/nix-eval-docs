@@ -93,10 +93,10 @@ index dadba98..8d969e8 100644
  
 diff --git a/nix-bindings/src/pos.rs b/nix-bindings/src/pos.rs
 new file mode 100644
-index 0000000..ecbb135
+index 0000000..556bcfd
 --- /dev/null
 +++ b/nix-bindings/src/pos.rs
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,37 @@
 +// TODO: ADD SAFETY CHECKS
 +
 +use std::{ffi::CStr, ptr::NonNull};
@@ -112,20 +112,6 @@ index 0000000..ecbb135
 +}
 +
 +impl Pos {
-+  pub fn get_source(&self) -> Result<String> {
-+    let source_ptr = unsafe { sys::nix_get_pos_source(self.inner.as_ptr()) };
-+
-+    if source_ptr.is_null() {
-+      return Err(Error::NullPointer);
-+    }
-+
-+    let source = unsafe { CStr::from_ptr(source_ptr) }
-+      .to_string_lossy()
-+      .into_owned();
-+
-+    Ok(source)
-+  }
-+
 +  pub fn get_source_path(&self) -> Result<String> {
 +    let source_path_ptr = unsafe { sys::nix_get_pos_source_path(self.inner.as_ptr()) };
 +
