@@ -23,7 +23,8 @@ See https://github.com/nix-community/nixdoc/issues/167.
     - [ ] Getter for `pos`
     - [x] Getter implemented and tested for `name`
     - [x] Not going to implement `arity` (see note below)
-    - [ ] Getter for `args`: Nix currently always returns `{}`
+    - [x] Getter for `args`: Nix currently always returns `{}` for lambdas
+        - [x] Working for PrimOps
         - [ ] Patch Nix so it returns the arguments?
 - [ ] Write Nix tests
 - [ ] Port changes to master and open Nix PR
