@@ -48,7 +48,7 @@ index 3f7e4bf..1bb75d1 100644
  
  #endif // NIX_API_EXPR_INTERNAL_H
 diff --git a/src/libexpr-c/nix_api_value.cc b/src/libexpr-c/nix_api_value.cc
-index 3cb5705..d234832 100644
+index 3cb5705..9eb9263 100644
 --- a/src/libexpr-c/nix_api_value.cc
 +++ b/src/libexpr-c/nix_api_value.cc
 @@ -757,4 +757,43 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
@@ -62,7 +62,7 @@ index 3cb5705..d234832 100644
 +        context->last_err_code = NIX_OK;
 +    try {
 +        auto & v = check_value_in(value);
-+        assert(v.type() == nix::nFunction); // TODO: Also check if it's a PrimOps or a Functor
++        assert(v.type() == nix::nFunction);
 +        auto doc = state->state.getDoc(v);
 +        if (doc)
 +            return new nix_doc{.doc = *doc};
