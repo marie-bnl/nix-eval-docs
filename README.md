@@ -25,10 +25,13 @@ See https://github.com/nix-community/nixdoc/issues/167.
     - [x] Not going to implement `arity` (see note below)
     - [ ] Getter for `args`: Nix currently always returns `{}`
         - [ ] Patch Nix so it returns the arguments?
+- [ ] Write Nix tests
+- [ ] Port changes to master and open Nix PR
 - [ ] Documentation for created nix-bindings functions
 - [ ] **Safety in nix-bindings patch**
-- [ ] Nix patch to generate `doc` on lambdas outside attrs
-    - [ ] Generate `doc` on non-lambda values?
+- [x] ~~Nix patch to generate `doc` on lambdas outside attrs~~
+    - [x] Actually it's already the case
+    - [ ] Remove function assertions
 - [ ] Unit tests
 - [ ] Implement in `nixdoc`
 
