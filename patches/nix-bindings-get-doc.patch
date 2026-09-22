@@ -119,7 +119,7 @@ index 0000000..1e405c8
 +  }
 +}
 diff --git a/nix-bindings/src/value.rs b/nix-bindings/src/value.rs
-index 80c9fd2..50a8c80 100644
+index 80c9fd2..9b59b2c 100644
 --- a/nix-bindings/src/value.rs
 +++ b/nix-bindings/src/value.rs
 @@ -6,6 +6,7 @@
@@ -130,7 +130,7 @@ index 80c9fd2..50a8c80 100644
    Error,
    EvalState,
    Result,
-@@ -592,6 +593,31 @@ impl<'a> Value<'a> {
+@@ -592,6 +593,27 @@ impl<'a> Value<'a> {
        ValueType::External => Ok("<external>".to_string()),
      }
    }
@@ -150,10 +150,6 @@ index 80c9fd2..50a8c80 100644
 +        self.inner.as_ptr(),
 +      )
 +    };
-+
-+    if doc_ptr.is_null() {
-+      return Err(Error::NullPointer);
-+    }
 +
 +    let inner = NonNull::new(doc_ptr).ok_or(Error::NullPointer)?;
 +
