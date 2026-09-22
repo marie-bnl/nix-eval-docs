@@ -219,10 +219,10 @@ index f0a8934..c8253a3 100644
  
      /**
 diff --git a/src/libutil-c/nix_api_util.cc b/src/libutil-c/nix_api_util.cc
-index f28a916..9e563d2 100644
+index f28a916..ebdbac7 100644
 --- a/src/libutil-c/nix_api_util.cc
 +++ b/src/libutil-c/nix_api_util.cc
-@@ -175,4 +175,14 @@ nix_err nix_set_verbosity(nix_c_context * context, nix_verbosity level)
+@@ -175,4 +175,22 @@ nix_err nix_set_verbosity(nix_c_context * context, nix_verbosity level)
      NIXC_CATCH_ERRS
  }
  
@@ -236,9 +236,17 @@ index f28a916..9e563d2 100644
 +    return pos->pos.column;
 +}
 +
++const char * nix_get_pos_source_path(nix_pos * pos)
++{
++    auto path = pos->pos.getSourcePath();
++    if (path)
++        return strdup(path->to_string().c_str());
++    return nullptr;
++}
++
  } // extern "C"
 diff --git a/src/libutil-c/nix_api_util.h b/src/libutil-c/nix_api_util.h
-index b48d916..a30c342 100644
+index b48d916..a1fc10b 100644
 --- a/src/libutil-c/nix_api_util.h
 +++ b/src/libutil-c/nix_api_util.h
 @@ -14,6 +14,8 @@
@@ -258,7 +266,7 @@ index b48d916..a30c342 100644
  
  /**
   * @brief Verbosity level
-@@ -363,6 +366,18 @@ void nix_clear_err(nix_c_context * context);
+@@ -363,6 +366,24 @@ void nix_clear_err(nix_c_context * context);
   */
  nix_err nix_set_verbosity(nix_c_context * context, nix_verbosity level);
  
@@ -273,6 +281,12 @@ index b48d916..a30c342 100644
 + * @return the column
 + */
 +uint32_t nix_get_pos_column(nix_pos * pos);
++
++/** @brief Get a position's source path
++ * @param[in] pos the position
++ * @return the source path
++ */
++const char * nix_get_pos_source_path(nix_pos * pos);
 +
  /**
   *  @}

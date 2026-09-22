@@ -20,9 +20,7 @@ See https://github.com/nix-community/nixdoc/issues/167.
     - [x] Rename Nix's `doc.doc` to smth more meaningful like `doc.content`
     - [x] Make `EvalState::getDoc` put only the content in it and move the "Function ... defined at ..." header generation to `nix repl`
 - [x] Getters for other `doc` fields
-    - [ ] Getters for `pos`
-        - [x] Line, column
-        - [ ] Other fields
+    - [x] Getters for `pos`: line, column, source path
     - [x] Getter implemented and tested for `name`
     - [x] Not going to implement `arity` (see note below)
     - [x] Getter for `args`: Nix currently always returns `{}` for lambdas
