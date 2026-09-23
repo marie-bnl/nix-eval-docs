@@ -135,7 +135,7 @@ index 0000000..556bcfd
 +  }
 +}
 diff --git a/nix-bindings/src/value.rs b/nix-bindings/src/value.rs
-index 80c9fd2..9b59b2c 100644
+index 80c9fd2..87f2d12 100644
 --- a/nix-bindings/src/value.rs
 +++ b/nix-bindings/src/value.rs
 @@ -6,6 +6,7 @@
@@ -146,15 +146,25 @@ index 80c9fd2..9b59b2c 100644
    Error,
    EvalState,
    Result,
-@@ -592,6 +593,27 @@ impl<'a> Value<'a> {
+@@ -592,6 +593,37 @@ impl<'a> Value<'a> {
        ValueType::External => Ok("<external>".to_string()),
      }
    }
 +
++  pub fn is_functor(&self) -> bool {
++    unsafe {
++      sys::nix_value_is_functor(
++        self.state.context.as_ptr(),
++        self.state.as_ptr(),
++        self.inner.as_ptr(),
++      )
++    }
++  }
++
 +  pub fn get_doc(&self) -> Result<Doc> {
-+    if self.value_type() != ValueType::Function {
++    if (self.value_type() != ValueType::Function && !self.is_functor()) {
 +      return Err(Error::InvalidType {
-+        expected: "function",
++        expected: "function or functor",
 +        actual:   self.value_type().to_string(),
 +      });
 +    }

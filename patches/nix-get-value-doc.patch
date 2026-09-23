@@ -1,8 +1,8 @@
 diff --git a/src/libcmd/repl.cc b/src/libcmd/repl.cc
-index c6523fe..f9e820d 100644
+index 9e3d99d75..deaccb762 100644
 --- a/src/libcmd/repl.cc
 +++ b/src/libcmd/repl.cc
-@@ -640,7 +640,27 @@ ProcessLineResult NixRepl::processLine(std::string line)
+@@ -641,7 +641,27 @@ ProcessLineResult NixRepl::processLine(std::string line)
                              + "\n\n";
              }
  
@@ -32,10 +32,10 @@ index c6523fe..f9e820d 100644
              logger->cout(trim(renderMarkdownToTerminal(markdown)));
          } else if (fallbackPos) {
 diff --git a/src/libexpr-c/nix_api_expr_internal.h b/src/libexpr-c/nix_api_expr_internal.h
-index 3f7e4bf..1bb75d1 100644
+index 16b32bfa4..e2fd47952 100644
 --- a/src/libexpr-c/nix_api_expr_internal.h
 +++ b/src/libexpr-c/nix_api_expr_internal.h
-@@ -72,6 +72,11 @@ struct nix_realised_string
+@@ -73,6 +73,11 @@ struct nix_realised_string
      std::vector<StorePath> storePaths;
  };
  
@@ -46,15 +46,26 @@ index 3f7e4bf..1bb75d1 100644
 +
  } // extern "C"
  
- #endif // NIX_API_EXPR_INTERNAL_H
+ // Shared helpers for validating nix_value [in] parameters across libexpr-c translation units.
 diff --git a/src/libexpr-c/nix_api_value.cc b/src/libexpr-c/nix_api_value.cc
-index 3cb5705..98536dc 100644
+index 0b1bc4529..f83f217b8 100644
 --- a/src/libexpr-c/nix_api_value.cc
 +++ b/src/libexpr-c/nix_api_value.cc
-@@ -757,4 +757,48 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
+@@ -722,4 +722,59 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * s, si
      return &s->storePaths[i];
  }
  
++bool nix_value_is_functor(nix_c_context * context, EvalState * state, nix_value * value)
++{
++    if (context)
++        context->last_err_code = NIX_OK;
++    try {
++        auto & v = check_value_in(value);
++        return state->state.isFunctor(v);
++    }
++    NIXC_CATCH_ERRS_RES(false)
++}
++
 +nix_doc *
 +nix_get_value_doc(nix_c_context * context, EvalState * state, nix_value * value)
 +{
@@ -62,7 +73,7 @@ index 3cb5705..98536dc 100644
 +        context->last_err_code = NIX_OK;
 +    try {
 +        auto & v = check_value_in(value);
-+        assert(v.type() == nix::nFunction);
++        assert(v.type() == nix::nFunction || state->state.isFunctor(v));
 +        auto doc = state->state.getDoc(v);
 +        if (doc)
 +            return new nix_doc{.doc = *doc};
@@ -101,7 +112,7 @@ index 3cb5705..98536dc 100644
 +
  } // extern "C"
 diff --git a/src/libexpr-c/nix_api_value.h b/src/libexpr-c/nix_api_value.h
-index 0220bf6..af62ed5 100644
+index 0220bf68e..cf9e68561 100644
 --- a/src/libexpr-c/nix_api_value.h
 +++ b/src/libexpr-c/nix_api_value.h
 @@ -107,6 +107,8 @@ typedef enum {
@@ -113,10 +124,16 @@ index 0220bf6..af62ed5 100644
  
  /** @deprecated Use nix_value instead */
  [[deprecated("use nix_value instead")]] typedef nix_value Value;
-@@ -731,6 +733,46 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
+@@ -731,6 +733,52 @@ const StorePath * nix_realised_string_get_store_path(nix_realised_string * reali
   */
  void nix_realised_string_free(nix_realised_string * realised_string);
  
++/** @brief Return whether value is a functor
++ * @param[in] value the value
++ * @return true if the value is a functor, false otherwise
++ */
++bool nix_value_is_functor(nix_c_context * context, EvalState * state, nix_value * value);
++
 +/** @brief Get a value's documentation from parsed doc comments.
 + * @param[out] context Optional, stores error information
 + * @param[in] state Nix evaluator state
@@ -161,10 +178,10 @@ index 0220bf6..af62ed5 100644
  #ifdef __cplusplus
  }
 diff --git a/src/libexpr/eval.cc b/src/libexpr/eval.cc
-index 29ecec6..602d564 100644
+index dcf41d713..a316c9d13 100644
 --- a/src/libexpr/eval.cc
 +++ b/src/libexpr/eval.cc
-@@ -599,7 +599,7 @@ std::optional<EvalState::Doc> EvalState::getDoc(Value & v)
+@@ -611,7 +611,7 @@ std::optional<EvalState::Doc> EvalState::getDoc(Value & v)
                  .name = primOp.name,
                  .arity = primOp.arity,
                  .args = primOp.args,
@@ -173,7 +190,7 @@ index 29ecec6..602d564 100644
              };
      }
      if (v.isLambda()) {
-@@ -618,22 +618,6 @@ std::optional<EvalState::Doc> EvalState::getDoc(Value & v)
+@@ -630,22 +630,6 @@ std::optional<EvalState::Doc> EvalState::getDoc(Value & v)
              docStr = exprLambda->docComment.getInnerText(positions);
          }
  
@@ -196,7 +213,7 @@ index 29ecec6..602d564 100644
          s << docStr;
  
          return Doc{
-@@ -643,7 +627,7 @@ std::optional<EvalState::Doc> EvalState::getDoc(Value & v)
+@@ -655,7 +639,7 @@ std::optional<EvalState::Doc> EvalState::getDoc(Value & v)
              .args = {},
              /* N.B. Can't use StringData here, because that would lead to an interior pointer.
                 NOTE: memory leak when compiled without GC. */
@@ -206,10 +223,10 @@ index 29ecec6..602d564 100644
      }
      if (isFunctor(v)) {
 diff --git a/src/libexpr/include/nix/expr/eval.hh b/src/libexpr/include/nix/expr/eval.hh
-index f0a8934..c8253a3 100644
+index a421a680b..1474ffa7d 100644
 --- a/src/libexpr/include/nix/expr/eval.hh
 +++ b/src/libexpr/include/nix/expr/eval.hh
-@@ -886,7 +886,7 @@ public:
+@@ -952,7 +952,7 @@ public:
           * Unlike the other `doc` fields in this file, this one should never be
           * `null`.
           */
@@ -219,7 +236,7 @@ index f0a8934..c8253a3 100644
  
      /**
 diff --git a/src/libutil-c/nix_api_util.cc b/src/libutil-c/nix_api_util.cc
-index f28a916..ebdbac7 100644
+index f28a9168e..ebdbac76b 100644
 --- a/src/libutil-c/nix_api_util.cc
 +++ b/src/libutil-c/nix_api_util.cc
 @@ -175,4 +175,22 @@ nix_err nix_set_verbosity(nix_c_context * context, nix_verbosity level)
@@ -246,7 +263,7 @@ index f28a916..ebdbac7 100644
 +
  } // extern "C"
 diff --git a/src/libutil-c/nix_api_util.h b/src/libutil-c/nix_api_util.h
-index b48d916..a1fc10b 100644
+index b48d9166d..a1fc10b0b 100644
 --- a/src/libutil-c/nix_api_util.h
 +++ b/src/libutil-c/nix_api_util.h
 @@ -14,6 +14,8 @@
@@ -292,7 +309,7 @@ index b48d916..a1fc10b 100644
   *  @}
   */
 diff --git a/src/libutil-c/nix_api_util_internal.h b/src/libutil-c/nix_api_util_internal.h
-index e4c5e93..356ba55 100644
+index e4c5e93bb..356ba553a 100644
 --- a/src/libutil-c/nix_api_util_internal.h
 +++ b/src/libutil-c/nix_api_util_internal.h
 @@ -5,6 +5,7 @@
