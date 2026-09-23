@@ -1,2 +1,3 @@
 /result*
-target
+/rust-doc/nix-bindings
+/rust-doc/target
