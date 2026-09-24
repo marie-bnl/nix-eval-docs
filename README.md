@@ -27,7 +27,7 @@ See https://github.com/nix-community/nixdoc/issues/167.
         - [x] Working for PrimOps
         - [ ] Patch Nix so it returns the arguments for lambdas?
 - [ ] Write Nix tests
-- [ ] Port changes to master and open Nix PR
+- [x] Port changes to master and open Nix PR
 - [ ] Documentation for created nix-bindings functions
 - [ ] **Safety in nix-bindings patch**
 - [ ] Docs for single lambda and non-lambda values
