@@ -12,7 +12,7 @@ rustPlatform.buildRustPackage {
 
   src = ./.;
 
-  cargoLock = ./Cargo.lock;
+  cargoHash = "sha256-FYxYB8EICInP3WZg6jDfXx5m9cw43aBbJpcgrZsCCQ0=";
 
   patchPhase = ''
     ln -s ${nix-bindings} nix-bindings
