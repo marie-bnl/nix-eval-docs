@@ -12,11 +12,10 @@ rustPlatform.buildRustPackage {
 
   src = ./.;
 
-  cargoHash = "sha256-rl1TB2Uzu+4fxB+JFU3K8doHmVuIvr8r0I0GvJ9NL60=";
+  cargoLock = ./Cargo.lock;
 
   patchPhase = ''
-    substituteInPlace Cargo.toml \
-      --subst-var-by "patched-nix-bindings-path" "${nix-bindings}"
+    ln -s ${nix-bindings} nix-bindings
   '';
 
   strictDeps = true;
